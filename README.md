@@ -1,9 +1,11 @@
 # Compression
 compression de données pour envoi sur réseau LPWAN
+
 # Objectifs
 Envoi de données issues d'un capteur en utilisant un nombre d'octets limités et avec des alogorithmes facilement implémentables sur des micro-controleurs.
 Exemple : utilisation de Sigfox avec limitation à 140 messages par jour et 12 octets par message.
 -> avec une mesure toutes les 15 secondes, cela revient à envoyer 32 valeurs toutes les 8 minutes sur 12 octets
+
 # Principes de compression
 La compression s'effectue par un envoi de paramètres permettant de reconstruire une séquence de plusieurs valeurs (séquence de 32 valeurs dans l'exemple ci-dessus). Les paramètres sont issus de plsuieurs estimations par régression linéaire.
 ## Etape 1 : Normalisation
@@ -27,6 +29,7 @@ Reconstitution des valeurs réelles à partir des valeurs mini/maxi et de la val
 Reconstitution des valeurs principales issues de la première régression (équation linéaire) ajoutées aux valeurs complémentaires issues de la deuxième régression.
 ## Etape 3 : Dénormalisation
 Mise à l'échelle des mesures à partir des seuils mini/maxi définis
+
 # Algorithmes utilisés
 ## Régression linéaire
 Minimisation de l'erreur quadratique :
@@ -36,3 +39,6 @@ Minimisation de l'erreur quadratique :
 Calcul du b optimal pour a fixé :
 - b optimal : somme (yi) / n - a * somme (xi) / n
 ## codage
+Utilisation d'une échelle linéaire pour transformer une valeur en un nombre codé sur plusieurs bits : 
+  valBit - MinBit = (MaxBit - MinBit) / (MaxRéel - MinRéel) * (ValRéel - MinRéel)
+
