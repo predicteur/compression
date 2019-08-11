@@ -2,7 +2,7 @@
 compression de données pour envoi sur réseau LPWAN
 
 # Objectifs
-Envoi de données issues d'un capteur en utilisant un nombre d'octets limités et avec des alogorithmes facilement implémentables sur des micro-controleurs.
+Envoi de données issues d'un capteur en utilisant un nombre d'octets limités et avec des algorithmes facilement implémentables sur des micro-controleurs.
 Exemple : utilisation de Sigfox avec limitation à 140 messages par jour et 12 octets par message.
 -> avec une mesure toutes les 15 secondes, cela revient à envoyer 32 valeurs toutes les 8 minutes sur 12 octets
 
@@ -21,6 +21,7 @@ Par exemple pour une séquence de 32 mesures découpées en 8 tranches et codée
 Ajustement des paramètres par recalcul des paramètres « b » optimaux associés aux paramètres « a » après codage / décodage.
 ## Étape 6 : écart-type
 Ajout et codage d’un dernier paramètre correspondant à l’ecart-type global.
+
 # Principes de décompression
 La décompression consiste à calculer les valeurs à partir des paramètres codés avec les étapes inverses à celles de la compression :
 ## Etape 1 : Décodage des paramètres
@@ -32,7 +33,7 @@ Mise à l'échelle des mesures à partir des seuils mini/maxi définis
 
 # Algorithmes utilisés
 ## Régression linéaire
-Minimisation de l'erreur quadratique :
+Minimisation de l'erreur quadratique pour une estimation par y = a * x + b :
 - a optimal : (somme (xi) * somme (yi) - n * somme (xi * yi)) / (somme (xi) * somme (xi) - n * somme(xi * xi))
 - b optimal : somme (yi) / n - a * somme (xi) / n
 ## Optimisation
@@ -40,5 +41,6 @@ Calcul du b optimal pour a fixé :
 - b optimal : somme (yi) / n - a * somme (xi) / n
 ## codage
 Utilisation d'une échelle linéaire pour transformer une valeur en un nombre codé sur plusieurs bits : 
+
   valBit - MinBit = (MaxBit - MinBit) / (MaxRéel - MinRéel) * (ValRéel - MinRéel)
 
