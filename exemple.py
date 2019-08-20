@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+
 """
 Created on Sun Aug 11 22:10:43 2019
-@author: a179227
+
+test sur une serie complete
 
 140 messages par jour 
 12 octets par message
@@ -28,14 +29,15 @@ ecret = 2 # coef d'écrétage des écarts pour la régression initiale ex. 2 (co
 nbreg = 8 # nombre de régression de niveau 1 ex. 8
 racine = 1 # fonction de normalisation des données (données ** racine) ex. racine = 0.5
 mini = 0.0 # plage mini et maxi des mesures prise en compte (écrétage sinon)
-maxi = 700.0 # plage mini et maxi des mesures prise en compte (écrétage sinon)
+maxi = 700.0 # plage mini et maxi des mesures prise en compte (écrétage sinon) ex. 700.0
 # parametres codage
-pla = 10.0 # plage pour les coefficients a de niveau 1 : abs(a) < pla * ecart-type ex. 8.0
-plb = 3.0 # plage pour les coefficients b de niveau 1 : abs(b) < plb * ecart-type ex. 8.0
+pla = 10.0 # plage pour les coefficients a de niveau 1 : abs(a) < pla * ecart-type ex. 10.0
+plb = 3.0 # plage pour les coefficients b de niveau 1 : abs(b) < plb * ecart-type ex. 3.0
 bit = 8 # nb de bits pour les coeff de niveau 0 ex. 8
 bitc = 4 # nb de bits pour les coeff de niveau 1 ex. 4
+taillepay = 8 # nb de messages qui composent le payload
 
-taille_ech = 32 # nombre de mesures d'un échantillon à coder
+taille_ech = 32 # nombre de mesures d'un échantillon à coder ex. 32
 totalOctet = (4*bit + nbreg * 2 * bitc)/8
 totalPointParRegression =  taille_ech//nbreg
 
@@ -62,10 +64,10 @@ with open(res, 'w', newline='') as csvfile:
     for i in range(nb_ech):
         y0 = pm25[i*taille_ech:(i+1)*taille_ech]
     
-        coef = compress(y0, ecret, nbreg, racine, mini, maxi, pla, plb, bit, bitc)
+        payload = compress(y0, ecret, nbreg, racine, mini, maxi, pla, plb, bit, bitc, taillepay)
+        (y0fo, ecartType) = decompress(payload, taille_ech, nbreg, racine, mini, maxi, pla, plb, bit, bitc, taillepay)
 
-        y0fo = decompress(coef, taille_ech, nbreg, racine, mini, maxi, pla, plb, bit, bitc)
-        
+        #print('et final et estimé', et(diff(y0, y0fo)), ecartType)
         for i in range(len(y0)):
             writer.writerow({'PM25':y0[i], 'PM25_codé':y0fo[i]})
         pm25_estim += y0fo

@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+
 """
 Created on Sun Aug 11 22:10:43 2019
-@author: a179227
+
+test sur une serie complete avec resultats intermédiaires
 
 140 messages par jour 
 12 octets par message
@@ -36,8 +37,10 @@ pla = 10.0 # plage pour les coefficients a de niveau 1 : abs(a) < pla * ecart-ty
 plb = 3.0 # plage pour les coefficients b de niveau 1 : abs(b) < plb * ecart-type ex. 8.0
 bit = 8 # nb de bits pour les coeff de niveau 0 ex. 8
 bitc = 4 # nb de bits pour les coeff de niveau 1 ex. 4
+taillepay = 8 # nb de messages qui composent le payload
 
 taille_ech = 32 # nombre de mesures d'un échantillon à coder
+
 totalOctet = (4*bit + nbreg * 2 * bitc)/8
 totalPointParRegression =  taille_ech//nbreg
 
@@ -66,23 +69,22 @@ with open(res, 'w', newline='') as csvfile:
     for i in range(nb_ech):  #nb_ech
         y0 = pm25[i*taille_ech:(i+1)*taille_ech]
     
-        coef = compression(normalisation(y0, mini, maxi, racine), nbreg, ecret)
-        coefi =codage(coef,len(y0), bit, bitc, pla, plb, nbreg)
-        coefp = decodage(coefi, len(y0), bit, bitc, pla, plb, nbreg)        
-        coefo = optimisation(coefp, normalisation(y0, mini, maxi, racine), nbreg)
-        coefio =codage(coefo,len(y0), bit, bitc, pla, plb, nbreg)
-
-        y0i = denormalisation(decompression(coef, len(y0), nbreg), mini, maxi, racine)
-        y0f = denormalisation(decompression(coefp, len(y0), nbreg), mini, maxi, racine)
-        y0io = denormalisation(decompression(coefo, len(y0), nbreg), mini, maxi, racine)
-        
+        coef   = compression(normalisation(y0, mini, maxi, racine), nbreg, ecret)
+        coefi  = codage(coef,len(y0), bit, bitc, pla, plb, nbreg)
+        coefp  = decodage(coefi, len(y0), bit, bitc, pla, plb, nbreg)        
+        coefo  = optimisation(coefp, normalisation(y0, mini, maxi, racine), nbreg)
+        coefio = codage(coefo,len(y0), bit, bitc, pla, plb, nbreg)
         coefpo = decodage(coefio, len(y0), bit, bitc, pla, plb, nbreg)
+        
+        y0i  = denormalisation(decompression(coef,   len(y0), nbreg), mini, maxi, racine)
+        y0f  = denormalisation(decompression(coefp,  len(y0), nbreg), mini, maxi, racine)
+        y0io = denormalisation(decompression(coefo,  len(y0), nbreg), mini, maxi, racine)
         y0fo = denormalisation(decompression(coefpo, len(y0), nbreg), mini, maxi, racine)
         
         for i in range(len(y0)):
             writer.writerow({'PM25':y0[i], 'PM25_comp':y0io[i], 'PM25_codé':y0fo[i]})
-        pm25_estim += y0f
-        pm25_inter += y0i
+        pm25_estim  += y0f
+        pm25_inter  += y0i
         pm25_estimo += y0fo
         pm25_intero += y0io
     
@@ -90,28 +92,13 @@ with open(res, 'w', newline='') as csvfile:
     biais = moy(pm25) - moy(pm25_estim)
     print(' Total octet : ', totalOctet)
     print('ecart type global: ', ecart_type, ' biais: ', biais, ' moyenne: ', moy(pm25))
+
     ecart_typei = et(diff(pm25, pm25_inter))
     biaisi = moy(pm25) - moy(pm25_inter)
     print('ecart type inter: ', ecart_typei, ' biais: ', biaisi, ' moyenne: ', moy(pm25))
-
     ecart_typeo = et(diff(pm25, pm25_estimo))
     biaiso = moy(pm25) - moy(pm25_estimo)
     print('ecart type global opt : ', ecart_typeo, ' biais: ', biaiso, ' moyenne: ', moy(pm25))
     ecart_typeio = et(diff(pm25, pm25_intero))
     biaisio = moy(pm25) - moy(pm25_intero)
     print('ecart type inter opt : ', ecart_typeio, ' biais: ', biaisio, ' moyenne: ', moy(pm25))
-    #print('coefp : ', coefp)
-    #print('coefo : ', coefo)
-'''
-print('y00 :', pr(y0))
-#print(coef('et'))
-print('y0i :', pr(y0i), pr(denormalisation([coef['et']], mini, maxi, racine)))
-print('y0f :', pr(y0f), pr(denormalisation([coefp['et']], mini, maxi, racine)))
-#print('coef', coef)
-#print('coefi', coefi)
-#print('coefp', coefp)
-print(et(coef0['ecart']), et(yecart))
-print('estim init :', coef0['estim'])
-print('estim finale : ', yest)
-print('ecart ', yecart)
-'''

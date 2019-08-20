@@ -2,11 +2,12 @@
 """
 Created on Sun Aug 11 21:49:49 2019
 
-@author: a179227
+fonctions de traitement des series 
+
 """
 
-def pr(serie) :
-    stri ='[ '
+def pr(serie, nom = 'serie') :
+    stri = nom +' : [ '
     for x in serie:
         stri += "{:6.3f} ".format(x)
     stri +=']'
@@ -33,3 +34,26 @@ def moy(serie) :
 def ecretage(serie, mini, maxi) :
     return [min(maxi, max(mini, val)) for val in serie]
 
+def addbin(param, payl, long) :
+    for i in range(long):
+        payl.append(param%2)
+        param //= 2
+    return
+
+def decbin(payl, long, rang) :
+    param = 0    
+    for j in range(long):
+        param += payl[rang+j]*2**j
+    return param
+
+def conversion(valeur, mini, maxi, bits, nom) :
+    minib = 0
+    maxib = 2**bits-1
+    val = minib + round((maxib - minib) * (valeur - mini) / (maxi - mini))
+    #if (val>maxib) : print("saturation : ", nom, valeur, mini, maxi)
+    return max(minib, min(maxib, val))
+
+def conversionb(valeurb, mini, maxi, bits) :
+    minib = 0
+    maxib = 2**bits-1
+    return mini + (maxi - mini) * float(valeurb - minib) / float(maxib - minib)
