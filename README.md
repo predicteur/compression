@@ -74,12 +74,12 @@ Les points de la courbe (xp(i), yp(i)) vérifient l'équation : Yp = Xp * P avec
 
     Yp matrice de dimension p     : Yp = (yp(1), yp(2), ... , yp(p-1))
     XP matrice de dimension p x p : Xp[i, j] = xp(i)**j
-Plutôt que d'utiliser pour la compression le paramètre P, on utilise le paramètre Yp qui correspond aux valeurs de p points équi-répartis sur la séquence : Yp = Xp * inv(S) * T.
+Plutôt que d'utiliser pour la compression le paramètre P, on utilise le paramètre Yp qui correspond aux valeurs de p points équi-répartis sur la séquence : 
 
-Pour la décompression, on reconstitue les valeurs Yn à partir du paramètre Yp : Yn = Xn * inv(Xp) * Yp (Yn : dimension n, Xn : dimension n x p, Xp : dimension p x p, Yp : dimension p)
+    Yp = Xp * inv(S) * T     (dimensions : Xn : p x p, S : p x p, T :  p)
+Pour la décompression, on reconstitue les valeurs Yn à partir du paramètre Yp : 
 
-
-
+    Yn = Xn * inv(Xp) * Yp   (dimensions : Yn : n, Xn : n x p, Xp : p x p, Yp :  p)
 ## codage
 Utilisation d'une échelle linéaire pour transformer une valeur en un nombre codé sur plusieurs bits : 
     
