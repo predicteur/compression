@@ -16,19 +16,16 @@ Les paramètres sont issus de plusieurs estimations par régression polynomiale 
 
 L'erreur de compression (écart-type entre les valeurs de départ et les valeurs reconstruites) est également intégrée à la compression.
 # Principe de la régression polynomiale
-Une séquence de n points est représentée par une courbe polynomiale : y = a0 + a1 * x + a2 * x2 + a3 * x3 + .. + a(p-1) * x(p-1). 
+Une séquence de n points est représentée par une courbe polynomiale : y = a0 + a1 * x + a2 * x*\*2 + a3 * x*\*3 + .. + a(p-1) * x*\*(p-1). 
 
 Les paramètres du polynome sont obtenus en minimisant l'écart quadratique entre les valeurs à compresser et celles de la courbe. 
 
-Les p coefficients (a0, ... a(p-1)) ou p points de la courbe suffisent à reconstruire les n points de départ (voir https://fr.wikipedia.org/wiki/R%C3%A9gression_polynomiale).
+Les p coefficients de la courbe suffisent à reconstruire les n points de départ.
 
 L'obtention des p points s'effectue par calcul matriciel (produit + inversion de matrice). La reconstruction des n points à partir des p points s'obtient également par calcul matriciel (produit uniquement).
-
-Lorsque p = 1, la courbe est constante -> la séquence est représentée par sa moyenne
-
-Lorsque p = 2, la courbe est une droite -> on obtient une régression linéaire
-
-Lorsque p = n, la courbe passe par tous les points -> la compression s'effectue uniquement sur le codage. 
+* Lorsque p = 1, la courbe est constante -> la séquence est représentée par sa moyenne
+* Lorsque p = 2, la courbe est une droite -> on obtient une régression linéaire
+* Lorsque p = n, la courbe passe par tous les points -> la compression s'effectue uniquement sur le codage. 
 # Principe de mise en oeuvre de la compression simple (classe : Compactor)
 ## Etape 1 : Normalisation
 Mise à une échelle de \[-0,5  0,5\] des valeurs de la séquence à partir des seuils mini, maxi imposés ou libres.
@@ -57,17 +54,36 @@ Une deuxième méthode combinant deux niveaux de régression est implémentée :
 
 2 - Réalisation d'une deuxième série de régressions sur des sous-séquences constituée des écarts entre les valeurs initiales et celles issues de la première régression. 
 
-Exemple d'une séquence de 32 points : On effectue une première régression avec deux points (linéaire). Pour les 32 écarts résiduels, on effectue 4 régressions (linéaire de 2 points) sur les 4 sous-séquences de 8 points. On a donc représenté nos 32 points initiaux par 2 + 4 * 2 points.
+*Exemple d'une séquence de 32 points* : On effectue une première régression avec deux points (linéaire). Pour les 32 écarts résiduels, on effectue 4 régressions (linéaire de 2 points) sur les 4 sous-séquences de 8 points. On a donc représenté nos 32 points initiaux par 2 + 4 * 2 points.
 
 Cette compression avancée s'appuie sur la classe de compression simple.
 
 # Algorithmes utilisés
 ## Régression polynomiale
-xxxxxxx -  
+*Notations* : 
+* Séquence : pour les instants successifs x0, x1, ... , xn-1 les valeurs sont : Yn =(y0, y1, ... , yn-1) (valeurs correspondantes)
+* Polynome : y = a0 * x\*\*0 + a1 * x*\*1 + ... + ap-1 * x*\*(p-1) = X * P avec X = (x*\*0, ... , x*\*(p-1)) et P = (a0, ... , ap-1)
+
+La solution P qui minimise l'écart avec la séquence fournie est donnée par : S * P = T [voir Wikipedia](https://fr.wikipedia.org/wiki/R%C3%A9gression_polynomiale) avec :
+    
+    S matrice de dimension p x p : S[i, j] = SOM(i+j)   avec SOM(j) = somme(xi ** j) de i = 0 à n-1
+    T matrice de dimension p     : T[i]    = somme(yi * xi ** j) de i = 0 à n-1
+La matrice P s'obtient donc par P = inv(S) * T
+
+Les points de la courbe (xp(i), yp(i)) vérifient l'équation : Yp = Xp * P avec :
+
+    Yp matrice de dimension p     : Yp = (yp(1), yp(2), ... , yp(p-1))
+    XP matrice de dimension p x p : Xp[i, j] = xp(i)**j
+Plutôt que d'utiliser pour la compression le paramètre P, on utilise le paramètre Yp qui correspond aux valeurs de p points équi-répartis sur la séquence : Yp = Xp * inv(S) * T.
+
+Pour la décompression, on reconstitue les valeurs Yn à partir du paramètre Yp : Yn = Xn * inv(Xp) * Yp (Yn : dimension n, Xn : dimension n x p, Xp : dimension p x p, Yp : dimension p)
+
+
 
 ## codage
 Utilisation d'une échelle linéaire pour transformer une valeur en un nombre codé sur plusieurs bits : 
+    
+    valBit =  MinBit + (MaxBit - MinBit) / (MaxRéel - MinRéel) * (ValRéel - MinRéel)
 
-  valBit - MinBit = (MaxBit - MinBit) / (MaxRéel - MinRéel) * (ValRéel - MinRéel)
 
 # Utilisation
