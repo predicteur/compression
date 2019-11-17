@@ -4,6 +4,7 @@ compression de données pour des séries temporelles (ex envoi sur réseau LPWAN
 # Objectifs
 1 - Remplacement d'un ensemble de points codés sur 16 bits (ex. entier) ou 32 bits (ex.réel) en un ensemble réduit de points et codés sur un nombre de bits réduits.
 Exemple : 16 points réels (64 octets) compressés en 14 octets
+
 2 - Implémentation avec des algorithmes facilement implémentables sur des micro-controleurs.
 Exemple : utilisation de Sigfox (imitation à 140 messages par jour et 12 octets par messag).
 -> avec une mesure toutes les 15 secondes, cela revient à envoyer 32 valeurs toutes les 8 minutes sur 12 octets
