@@ -3,10 +3,10 @@ Compression de données pour des séries temporelles (ex envoi sur réseau LPWAN
 
 # Objectifs
 1 - Remplacement d'un ensemble de points codés sur 16 bits (ex. entier) ou 32 bits (ex.réel) en un ensemble réduit de points et codés sur un nombre de bits réduits.
-Exemple : 16 points réels (64 octets) compressés en 14 octets
+Exemple : 16 points réels (64 octets) compressés en 12 octets
 
 2 - Utilisation d'algorithmes facilement implémentables sur des micro-controleurs.
-Exemple : utilisation de Sigfox (imitation à 140 messages par jour et 12 octets par messag).
+Exemple : utilisation de Sigfox (limitation à 140 messages par jour et 12 octets par message).
 -> avec une mesure toutes les 15 secondes, on peut envoyer 32 valeurs toutes les 8 minutes sur 12 octets
 
 # Principes de compression
@@ -52,9 +52,9 @@ Une deuxième méthode combinant deux niveaux de régression est implémentée :
 
 1 - Réalisation d'une première régression sur la séquence fournie.
 
-2 - Réalisation d'une deuxième série de régressions sur des sous-séquences constituée des écarts entre les valeurs initiales et celles issues de la première régression. 
+2 - Réalisation d'une deuxième série de régressions sur des sous-séquences constituée des écarts entre les valeurs initiales et celles issues de la première régression. Les points de la deuxième régression sont codés dans l'enveloppe de la moyenne de l'écart +/- deux écart-type, ce qui permet de réduire le nombre de bits de codage nécessaire.
 
-*Exemple d'une séquence de 32 points* : On effectue une première régression avec deux points (linéaire). Pour les 32 écarts résiduels, on effectue 4 régressions (linéaire de 2 points) sur les 4 sous-séquences de 8 points. On a donc représenté nos 32 points initiaux par 2 + 4 * 2 points.
+*Exemple d'une séquence de 32 points* : On effectue une première régression avec un point (moyenne). Pour les 32 écarts à la moyenne, on effectue 4 régressions (polynomiales sur 3 points) sur les 4 sous-séquences de 8 points. On a donc représenté nos 32 points initiaux par 1 + 4 * 3 points. Le codage des 4 * 3 points peut se faire sur un nombre de bits faible en fonction de la plage de 4 écart-type (3 ou 4) alors que le codage du point de moyenne ou de l'écart-type initial doiot se faire en fonction de la plage mini-maxi définie
 
 Cette compression avancée s'appuie sur la classe de compression simple.
 
@@ -84,6 +84,11 @@ Pour la décompression, on reconstitue les valeurs Yn à partir du paramètre Yp
 Utilisation d'une échelle linéaire pour transformer une valeur en un nombre codé sur plusieurs bits : 
     
     valBit =  MinBit + (MaxBit - MinBit) / (MaxRéel - MinRéel) * (ValRéel - MinRéel)
-
+La précision du codage est donné par :
+    
+    précision = (MaxRéel - MinRéel) / (2**bit - 1)
+    ex. si Max = 1000, Min = 0, bit = 4 --> précision = 66,7
+Dans le cas de la compression avancée, la deuxième régression s'effectue sur un intervalle entre -2 * écart-type et 2 * écart-type, la précision de cette deuxième régression est donc de : écart-type / (2**(bit-2)-0,25)
 
 # Utilisation
+Voir les exemples donnés sur les deux types de régressions.
