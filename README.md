@@ -18,18 +18,18 @@ L'erreur de compression (écart-type entre les valeurs de départ et les valeurs
 # Mise en oeuvre
 Deux types d'algorithmes sont mis en place (classe : Compactor et classe : Compressor), ils présentent les fonctions suivantes :
 * fonctions indépendantes d'un jeu de données : 
-    * check()               : vérification des paramètres d'entrée
-    * taillePayload()       : nombre de bits des données compressées
-    * precisionCodage()     : précision du codage utilisé
+    * **check()**               : vérification des paramètres d'entrée 
+    * **taillePayload()**       : nombre de bits des données compressées
+    * **precisionCodage()**     : précision du codage utilisé
 * fonctions liées au jeu de données : 
-    * calcul()              : génération des principales sorties
-    * simul()               : valeurs simulées après compression / décompression (utilisable après calcul)
-    * ecartTypeSimul()      : écart-type des valeurs simulées / valeurs d'origine - fonction (utilisable après calcul)
-    * compress()            : valeurs compressées (utilisable après calcul)
+    * **calcul()**              : génération des principales sorties
+    * **simul()**               : valeurs simulées après compression / décompression (utilisable après calcul)
+    * **ecartTypeSimul()**      : écart-type des valeurs simulées / valeurs d'origine - fonction (utilisable après calcul)
+    * **compress()**            : valeurs compressées (utilisable après calcul)
 * fonctions liées à la décompression d'un jeu de données :
-    * decompressY0()        : valeurs reconstituées par la décompression
-    * decompressYp()        : valeurs des paramètres issus de la régression (Compactor uniquement)
-    * decompressEcartType() : écart-type des valeurs simulées / valeurs d'origine
+    * **decompressY0()**        : valeurs reconstituées par la décompression
+    * **decompressYp()**        : valeurs des paramètres issus de la régression (Compactor uniquement)
+    * **decompressEcartType()** : écart-type des valeurs simulées / valeurs d'origine
 # Principe de la compression simple (classe : Compactor)
 ## Etape 1 : Normalisation
 Mise à une échelle de \[-0,5  0,5\] des valeurs de la séquence à partir des seuils mini, maxi imposés ou libres.
